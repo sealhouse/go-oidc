@@ -19,7 +19,7 @@ import (
 // StaticKeySet is a verifier that validates JWT against a static set of public keys.
 type StaticKeySet struct {
 	// PublicKeys used to verify the JWT. Supported types are *rsa.PublicKey,
-	// *ecdsa.PublicKey, and ed25519.PublicKey.
+	// *ecdsa.PublicKey, ed25519.PublicKey, and *mldsa.PublicKey (Go 1.27+).
 	PublicKeys []crypto.PublicKey
 }
 
@@ -27,7 +27,7 @@ type StaticKeySet struct {
 func (s *StaticKeySet) VerifySignature(ctx context.Context, jwt string) ([]byte, error) {
 	// Algorithms are already checked by Verifier, so this parse method accepts
 	// any algorithm.
-	jws, err := jose.ParseSigned(jwt, allAlgs)
+	jws, err := jose.ParseSignedCompact(jwt, allAlgs)
 	if err != nil {
 		return nil, fmt.Errorf("parsing jwt: %v", err)
 	}
@@ -37,7 +37,9 @@ func (s *StaticKeySet) VerifySignature(ctx context.Context, jwt string) ([]byte,
 		case *ecdsa.PublicKey:
 		case ed25519.PublicKey:
 		default:
-			return nil, fmt.Errorf("invalid public key type provided: %T", pub)
+			if !isMLDSAPublicKey(pub) {
+				return nil, fmt.Errorf("invalid public key type provided: %T", pub)
+			}
 		}
 		payload, err := jws.Verify(pub)
 		if err != nil {
@@ -144,7 +146,7 @@ func (r *RemoteKeySet) VerifySignature(ctx context.Context, jwt string) ([]byte,
 		// Practically, this codepath isn't called in normal use of this package, but
 		// if it is, the algorithms have already been checked.
 		var err error
-		jws, err = jose.ParseSigned(jwt, allAlgs)
+		jws, err = jose.ParseSignedCompact(jwt, allAlgs)
 		if err != nil {
 			return nil, fmt.Errorf("oidc: malformed jwt: %v", err)
 		}
