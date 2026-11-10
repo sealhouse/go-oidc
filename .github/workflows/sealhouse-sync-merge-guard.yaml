@@ -1,0 +1,11 @@
+name: sealhouse-sync-merge-guard
+
+on:
+  pull_request:
+    branches: [rhtas/main]
+
+permissions: {}
+
+jobs:
+  sync-merge-guard:
+    uses: sealhouse/ci/.github/workflows/sync-merge-guard.yaml@b1d5b917f99d991f75e4c97ed9ecb20d427d7fa8

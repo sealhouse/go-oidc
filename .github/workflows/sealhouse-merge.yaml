@@ -1,0 +1,13 @@
+name: sealhouse-merge
+
+on:
+  push:
+    branches: [rhtas/main, 'release-*']
+
+permissions: {}
+
+jobs:
+  merge:
+    uses: sealhouse/ci/.github/workflows/merge.yaml@b1d5b917f99d991f75e4c97ed9ecb20d427d7fa8
+    with:
+      ci-ref: b1d5b917f99d991f75e4c97ed9ecb20d427d7fa8

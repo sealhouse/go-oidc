@@ -1,0 +1,17 @@
+name: sealhouse-pr
+
+on:
+  pull_request:
+    branches: [rhtas/main, 'release-*']
+
+permissions: {}
+
+jobs:
+  pr:
+    uses: sealhouse/ci/.github/workflows/pr.yaml@b1d5b917f99d991f75e4c97ed9ecb20d427d7fa8
+    with:
+      ci-ref: b1d5b917f99d991f75e4c97ed9ecb20d427d7fa8
+      test: ''
+    secrets:
+      dispatch-app-id: ${{ secrets.SEALHOUSE_DISPATCH_APP_ID }}
+      dispatch-app-key: ${{ secrets.SEALHOUSE_DISPATCH_APP_KEY }}
